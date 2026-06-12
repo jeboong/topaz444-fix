@@ -223,11 +223,14 @@ if ($WhatIfOnly) {
 Write-Host ""
 Log "2단계. 회사 표준 프리셋 설치" 'White'
 
+# 주의: Topaz Video 1.5 부터 GUI 는 ProgramData\presets 폴더의 json 만 프리셋으로
+# 로드한다 (Roaming\presets 는 더 이상 읽지 않음). 호환을 위해 두 곳 모두에 설치한다.
 $presetJson = @'
 {
     "name": "Codex Rhea 4K Apollo 24 ProRes4444",
     "description": "4K Rhea upscale, Apollo frame interpolation at 24 fps, duplicate-frame replacement off. CLI uses MOV ProRes 4444 and audio copy.",
     "author": "Codex",
+    "path": "C:/ProgramData/Topaz Labs LLC/Topaz Video/presets/Codex Rhea 4K Apollo 24 ProRes4444.json",
     "saveOutputSettings": true,
     "date": "Tue May 19 16:31:09 2026 GMT+0900",
     "veaiversion": "1.5.0",
@@ -255,14 +258,20 @@ $presetJson = @'
 }
 '@
 
-$presetDir  = Join-Path $env:APPDATA 'Topaz Labs LLC\Topaz Video\presets'
-$presetPath = Join-Path $presetDir 'Codex Rhea 4K Apollo 24 ProRes4444.json'
-if ($WhatIfOnly) {
-  Log ("  -> 프리셋 설치 대상: " + $presetPath) 'Yellow'
-} else {
-  New-Item -ItemType Directory -Force -Path $presetDir | Out-Null
-  [IO.File]::WriteAllText($presetPath, $presetJson, (New-Object Text.UTF8Encoding($false)))
-  Done "프리셋 설치: $presetPath"
+$presetName    = 'Codex Rhea 4K Apollo 24 ProRes4444.json'
+$presetTargets = @(
+  (Join-Path $env:ProgramData 'Topaz Labs LLC\Topaz Video\presets'),  # GUI 가 실제로 읽는 곳 (1.5+)
+  (Join-Path $env:APPDATA     'Topaz Labs LLC\Topaz Video\presets')   # 구버전 호환
+)
+foreach ($dir in $presetTargets) {
+  $presetPath = Join-Path $dir $presetName
+  if ($WhatIfOnly) {
+    Log ("  -> 프리셋 설치 대상: " + $presetPath) 'Yellow'
+  } else {
+    New-Item -ItemType Directory -Force -Path $dir | Out-Null
+    [IO.File]::WriteAllText($presetPath, $presetJson, (New-Object Text.UTF8Encoding($false)))
+    Done "프리셋 설치: $presetPath"
+  }
 }
 
 # =====================================================================

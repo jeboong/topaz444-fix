@@ -42,8 +42,8 @@
   - `prores-422-4444-win` 인코더 항목 추가 (변경 전 파일은 같은 폴더에 `video-encoders.backup_444fix_날짜.json` 으로 백업)
   - 토파즈가 서버 목록으로 다시 덮어쓰지 못하도록 파일을 읽기 전용으로 설정 (롤백 시 해제)
   - 2026-06 서버 배포판의 새 인코더 구조(`encoderOpts`)와 이전 구조(`ffmpegOpts`)를 자동 감지해서 맞는 형식으로 추가
-- `%AppData%\Topaz Labs LLC\Topaz Video\presets\`
-  - 회사 표준 프리셋 1개 설치
+- `C:\ProgramData\Topaz Labs LLC\Topaz Video\presets\` 및 `%AppData%\Topaz Labs LLC\Topaz Video\presets\`
+  - 회사 표준 프리셋 1개 설치 (토파즈 1.5부터 GUI는 ProgramData 쪽만 읽으므로 두 곳 모두 설치)
 - 레지스트리 `HKCU\Software\Topaz Labs LLC\Topaz Video`
   - `maxMemoryUsage`: 100 → 85
 - 레지스트리 `HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers`
