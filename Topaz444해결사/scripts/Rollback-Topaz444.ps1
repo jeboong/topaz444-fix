@@ -31,13 +31,21 @@ if (-not (Test-Path $statePath)) {
 }
 $state = Get-Content $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
 
-# 1. video-encoders.json 백업 복원
+# 1. video-encoders.json 백업 복원 (+ 읽기 전용 잠금 해제)
 if ($state.encoderBackup -and (Test-Path $state.encoderBackup)) {
   $target = Join-Path (Split-Path -Parent $state.encoderBackup) 'video-encoders.json'
+  if (Test-Path $target) { (Get-Item -LiteralPath $target).IsReadOnly = $false }
   Copy-Item -LiteralPath $state.encoderBackup -Destination $target -Force
-  Write-Host "[완료] video-encoders.json 을 백업본으로 복원했습니다." -ForegroundColor Green
+  (Get-Item -LiteralPath $target).IsReadOnly = $false
+  Write-Host "[완료] video-encoders.json 을 백업본으로 복원하고 잠금을 해제했습니다." -ForegroundColor Green
 } else {
-  Write-Host "[건너뜀] 복원할 인코더 백업이 없습니다." -ForegroundColor DarkYellow
+  $target = Join-Path $env:ProgramData 'Topaz Labs LLC\Topaz Video\models\video-encoders.json'
+  if (Test-Path $target) {
+    (Get-Item -LiteralPath $target).IsReadOnly = $false
+    Write-Host "[완료] 복원할 백업은 없지만 video-encoders.json 잠금은 해제했습니다." -ForegroundColor Green
+  } else {
+    Write-Host "[건너뜀] 복원할 인코더 백업이 없습니다." -ForegroundColor DarkYellow
+  }
 }
 
 # 2. Topaz 메모리 사용 한도 복원
